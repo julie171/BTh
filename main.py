@@ -42,7 +42,7 @@ def SolveTask():
     # A = array([[1, 1]])  # eq
     idsZones, idsLinks, links, c, t0, graphNodesDict, rho, connectDict = ReceivedDicts()
     tauVal = Tau(t0, c)
-    y0 = [len(idsLinks) * 0]
+    y0 = len(idsLinks) * [0]
     tauValues = tauVal.TauValues(y0)
     _, _, y0 = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
     t = Task(t0, c)
