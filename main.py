@@ -18,6 +18,7 @@ def FrankWolf(idsZones, idsLinks, links, tauVal, graphNodesDict, rho, y0, gR, co
     c = t - tauValues
 
     zonePath, xp, fk = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
+    s = sum(xp)
     pk = fk - yk
     c = dot(diff, pk)
     gamma = max(gamma, dot(diff, pk) + free)
@@ -31,9 +32,9 @@ def FrankWolf(idsZones, idsLinks, links, tauVal, graphNodesDict, rho, y0, gR, co
         diff, free = tauVal.LinearValue(yk)
         tauValues = tauVal.TauValues(yk)
 
-        zonePath, xp, fk = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones)
+        zonePath, xp, fk = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
         pk = fk - yk
-        gamma = max(gamma, dot(diff, fk) + free)
+        gamma = max(gamma, dot(diff, pk) + free)
     return yk, k, zonePath, xp
 
 
