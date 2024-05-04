@@ -1,7 +1,5 @@
 import numpy as np
 
-import sys
-
 
 directName = "input_data"
 
@@ -60,11 +58,11 @@ def ReadLinks(fileName):
             ids.append(int(numbers[0]))
             x.append(int(numbers[1]))
             y.append(int(numbers[2]))
-            c.append(float(numbers[5]))
+            c.append(float(numbers[5])/1440.0)
             t.append(float(numbers[3])/float(numbers[6]))
         string = f.readline()
     f.close()
-    c = np.array(c) * 0.001
+    c = np.array(c)
     t = np.array(t)
     ids = np.array(ids)
     return ids, x, y, c, t
@@ -119,29 +117,3 @@ def ReceivedDicts():
 
     return idsZones, idsLinks, links, c, t, graphNodesDict, SOD, connectDict
 
-print(sys.version)
-
-idsNodes = ReadNodes("\input_nodes.net")
-
-idsZones = ReadNodes("\input_zones.net")
-
-idsLinks, fromNode, toNode, c, t = ReadLinks("\input_links.net")
-# linksDict = dict(zip(idsLinks, [[i, toNode[id]] for id, i in enumerate(fromNode)]))
-links = [[i, toNode[id]] for id, i in enumerate(fromNode)]
-
-idsNodes = idsZones + idsNodes
-
-graphNodesDict = dict(zip(idsNodes, [[] for _ in range(len(idsNodes))]))
-for id, node in enumerate(fromNode):
-    graphNodesDict[node].append(toNode[id])
-
-fromZone, toNode = ReadConnectors("\input_connectors.net")
-for id, node in enumerate(fromZone):
-    graphNodesDict[node].append(toNode[id])
-
-fromZone, toZone, values = ReadSOD("\input_sod.net")
-SOD = np.zeros((len(idsNodes), len(idsNodes)))
-for id, zone in enumerate(fromZone):
-    i = idsNodes.index(zone)
-    j = idsNodes.index(toZone[id])
-    SOD[i, j] = values[id] * 1000

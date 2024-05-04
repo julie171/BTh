@@ -19,8 +19,8 @@ def FrankWolf(idsZones, idsLinks, links, tauVal, graphNodesDict, rho, y0, gR, co
 
     zonePath, xp, fk = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
     pk = fk - yk
-    c = dot(diff, fk) + free
-    gamma = max(gamma, dot(diff, fk) + free)
+    c = dot(diff, pk)
+    gamma = max(gamma, dot(diff, pk) + free)
     while (b := (tauVal.TValue(yk) - gamma) / gamma) > epsilon:
         lk = gR.solve(0.00001, yk, pk) # метод золотого сечения
         yk = yk + lk * pk

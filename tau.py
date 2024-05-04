@@ -8,9 +8,9 @@ class Tau:
         self.c = c
 
     def LinearValue(self, point):
-        free = sum(integrValue(point, self.t0, self.c))
-        diff = funcValue(point, self.t0, self.c)
-        return diff, free - np.dot(diff, point)
+        free = self.TValue(point)
+        diff = self.TauValues(point)
+        return diff, free
 
     def TauValues(self, point):
         return funcValue(point, self.t0, self.c)
