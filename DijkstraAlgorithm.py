@@ -87,14 +87,14 @@ def dijkstra(graph, start, tauValues, links, idsLinks, idsZones):
 
     while pq:
         currentDist, currentVertex = heapq.heappop(pq)
-        while visited[currentVertex] == True and len(pq) > 0:
+        while visited[currentVertex] == True:
             if len(pq) == 0:
                 return path, dist
             currentDist, currentVertex = heapq.heappop(pq)
 
         visited[currentVertex] = True
         for neighbor in graph[currentVertex]:
-            if neighbor in idsZones:
+            if visited[neighbor] == True:
                 continue
             index = links.index([currentVertex, neighbor])
             distance = currentDist + tauValues[index]
@@ -102,7 +102,7 @@ def dijkstra(graph, start, tauValues, links, idsLinks, idsZones):
                 dist[neighbor] = distance
                 path[neighbor].clear()
                 path[neighbor] = copy.deepcopy(path[currentVertex])
-                path[neighbor].append(idsLinks[index])
+                path[neighbor].append(index)
                 heapq.heappush(pq, (distance, neighbor))
             # elif distance == dist[neighbor]:
             #     way1 = copy.deepcopy(path[currentVertex])
@@ -144,15 +144,15 @@ def solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connec
     ye = np.array([0.0] * len(idsLinks))
     zonePath = []
     xp = []
-    for id, i in enumerate(idsZones):
+    for id, fromZone in enumerate(idsZones):
         toZones = [n for n, i in enumerate(rho[id]) if i > 0]
         if len(toZones) > 0:
             # toNodes = []
             # for k in toZones:
             #     toNodes.append(graph[idsZones[k]])
-            path, dist = dijkstra(graph, i, tauValues, links, idsLinks, idsZones)
-            for zone in toZones:
-                toNodes = connectDict[idsZones[zone]]
+            path, dist = dijkstra(graph, fromZone, tauValues, links, idsLinks, idsZones)
+            for toZone in toZones:
+                toNodes = connectDict[idsZones[toZone]]
                 minDist = np.inf
                 minNode = 0
                 for node in toNodes:
@@ -161,7 +161,7 @@ def solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connec
                         minNode = node
                 way = path[minNode]
                 temp = copy.deepcopy(way)
-                temp.append(zone)
+                temp.append(toZone)
                 zonePath.append([id] + temp)
                 # if isinstance(way[0], list):
                 #     for w in way:
@@ -170,9 +170,8 @@ def solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connec
                 #             ye[index[0]] += rho[id][zone] / len(way)
                 # else:
                 for e in way:
-                    index = np.where(idsLinks == e)
-                    ye[index[0]] += rho[id][zone]
-                xp.append(rho[id][zone])
+                    ye[e] += rho[id][toZone]
+                xp.append(rho[id][toZone])
 
     return zonePath, xp, ye
 

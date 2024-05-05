@@ -104,9 +104,10 @@ def ReceivedDicts():
     fromZone, toNode = ReadConnectors("\input_connectors.net")
     for id, node in enumerate(fromZone):
         graphNodesDict[node].append(toNode[id])
-    connectDict = dict(zip(idsNodes, [[] for _ in range(len(idsNodes))]))
+    connectDict = dict(zip(idsZones, [[] for _ in range(len(idsZones))]))
     for id, node in enumerate(toNode):
-        connectDict[node].append(fromNode[id])
+        if node in idsZones:
+            connectDict[node].append(fromZone[id])
 
     fromZone, toZone, values = ReadSOD("\input_sod.net")
     SOD = np.zeros((len(idsZones), len(idsZones)))

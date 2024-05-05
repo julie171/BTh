@@ -15,13 +15,25 @@ def FrankWolf(idsZones, idsLinks, links, tauVal, graphNodesDict, rho, y0, gR, co
     diff, free = tauVal.LinearValue(yk)
     tauValues = tauVal.TauValues(yk)
 
-    c = t - tauValues
-
     zonePath, xp, fk = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
     s = sum(xp)
     pk = fk - yk
     c = dot(diff, pk)
     gamma = max(gamma, dot(diff, pk) + free)
+
+    while gamma == 0.0:
+        lk = gR.solve(0.00001, yk, pk)  # метод золотого сечения
+        yk = yk + lk * pk
+        k += 1
+
+        diff, free = tauVal.LinearValue(yk)
+        tauValues = tauVal.TauValues(yk)
+
+        zonePath, xp, fk = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
+        pk = fk - yk
+        c = dot(diff, pk)
+        gamma = max(gamma, dot(diff, pk) + free)
+
     while (b := (tauVal.TValue(yk) - gamma) / gamma) > epsilon:
         lk = gR.solve(0.00001, yk, pk) # метод золотого сечения
         yk = yk + lk * pk
@@ -34,6 +46,7 @@ def FrankWolf(idsZones, idsLinks, links, tauVal, graphNodesDict, rho, y0, gR, co
 
         zonePath, xp, fk = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
         pk = fk - yk
+        c = dot(diff, pk)
         gamma = max(gamma, dot(diff, pk) + free)
     return yk, k, zonePath, xp
 
@@ -42,7 +55,7 @@ def SolveTask():
     # A = array([[1, 1]])  # eq
     idsZones, idsLinks, links, c, t0, graphNodesDict, rho, connectDict = ReceivedDicts()
     tauVal = Tau(t0, c)
-    y0 = len(idsLinks) * [0]
+    y0 = array([0.0] * len(idsLinks))
     tauValues = tauVal.TauValues(y0)
     _, _, y0 = dijkstra.solve_minT(rho, tauValues, graphNodesDict, idsLinks, links, idsZones, connectDict)
     t = Task(t0, c)
